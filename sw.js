@@ -1,5 +1,5 @@
 /* 건강참조 서비스워커: 오프라인 실행 + 알림 클릭 시 앱 열기 */
-const CACHE = "healthref-v4";
+const CACHE = "healthref-v5";
 const FILES = ["./", "index.html", "app.js", "kb.js", "advice.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

@@ -5,7 +5,7 @@
  * 조사일: 2026-11-07
  * ※ 본 자료는 진료를 대체하지 않습니다. 약 조절은 반드시 주치의와 상의.
  * ========================================================= */
-const KB_VERSION = "2026-11-07d";
+const KB_VERSION = "2026-11-07e";
 
 const SOURCES = {
   S1: { t: "와파린 복용자 건강한 식사 지침 (HealthLinkBC, 2023)", u: "https://www.healthlinkbc.ca/sites/default/files/documents/healthy-eating-guidelines-for-people-taking-warfarin-anticoagulants-k.pdf", type: "공공보건기관" },
@@ -66,7 +66,14 @@ const SOURCES = {
   S56: { t: "어깨 스트레칭, 이렇게 하면 오히려 악화됩니다 (김상현 전문의)", u: "https://www.hyunmyoung.co.kr/spine/어깨-스트레칭-이렇게-하면-오히려-악화됩니다", type: "의사 글" },
   S57: { t: "정적 스트레칭이 중년 여성 어깨굳음증의 통증·운동범위에 미치는 영향 (대한물리치료과학회지 2024)", u: "https://koreascience.kr/article/JAKO202422639195308.pdf", type: "논문" },
   S58: { t: "어깨 통증 재활운동 - 아프지 않을 만큼, 코드만·지팡이 운동 (대구파티마병원 재활의학과, 매일신문)", u: "https://www.imaeil.com/page/view/2020071314043388148", type: "의사·언론" },
-  S59: { t: "오십견 자가 점검과 스트레칭 - 온찜질 후 스트레칭 (정형외과 전문의 조언, 인사이트 2026-10)", u: "https://www.insight.co.kr/news/575955", type: "언론" }
+  S59: { t: "오십견 자가 점검과 스트레칭 - 온찜질 후 스트레칭 (정형외과 전문의 조언, 인사이트 2026-10)", u: "https://www.insight.co.kr/news/575955", type: "언론" },
+  S60: { t: "레비티라세탐 허가정보 - 졸음·피로·협조운동장애(첫 4주), 행동이상, 기분 변화 (식약처, 약학정보원)", u: "https://www.health.kr/drug/2012103000011", type: "허가정보" },
+  S61: { t: "뇌전증과 함께 나타나는 증상 - 발작 대처, 5분 이상 119, 수면 부족 유발 (김상현 신경외과 전문의)", u: "https://www.hyunmyoung.co.kr/neurology/epilepsy-associated-symptoms", type: "의사 글" },
+  S62: { t: "뇌전증, 방치하면 - 항뇌전증약 임의 중단 금지 (김상현 신경외과 전문의)", u: "https://www.hyunmyoung.co.kr/neurology/epilepsy-if-untreated", type: "의사 글" },
+  S63: { t: "Levetiracetam does not affect warfarin PK/PD - 이중맹검 시험 (Epilepsy Research 2001)", u: "https://go.drugbank.com/articles/A7167", type: "논문" },
+  S64: { t: "발작 시 옆으로 눕혀 기도 확보, 물 먹이지 말기 (온병원 신경과, 코메디닷컴)", u: "https://kormedi.com/2723996/", type: "의사·언론" },
+  S65: { t: "콜린알포세레이트 임상재평가 - 1차 평가변수 미충족, 식약처 판단 대기 (한국경제 2026-07)", u: "https://www.hankyung.com/article/2026071434531", type: "언론" },
+  S66: { t: "콜린 첫 임상재평가, 목표 미충족에도 인지기능 개선 확인 (데일리팜 2026-05)", u: "https://m.dailypharm.com/user/news/338801", type: "언론" }
 };
 
 /* 질환 정의: 병력/현재상태 텍스트에서 키워드로 인식 */
@@ -162,6 +169,22 @@ const CONDITIONS = [
     refs: ["S55", "S56", "S57", "S58", "S59"]
   },
   {
+    id: "neuro_meds",
+    name: "신경외과 약 (케프라·글리아타민)",
+    keys: ["케프라", "레비티라세탐", "글리아타민", "콜린알포"],
+    summary: [
+      "케프라(레비티라세탐)는 경련 예방약. 의사와 상의 없이 끊거나 거르지 않기 [S62,S61]",
+      "케프라 초기 4주에 졸음·피로·휘청거림이 흔함 → 일어설 때 천천히, 넘어짐 주의 [S60,S47]",
+      "케프라 복용 중 기분·성격 변화(짜증·우울감)가 보이면 주치의에게 알리기 [S60]",
+      "케프라와 와파린은 연구에서 서로 영향이 없었음 (2001년 연구) [S63]",
+      "잠이 부족하면 경련 유발 요인이 됨 → 수면 지키기 [S61,S62]",
+      "경련 시: 위험한 물건 치우고 옆으로 눕히기, 입에 아무것도 넣지 않기, 물 먹이지 않기, 5분 이상·반복되면 119 [S61,S64]",
+      "글리아타민(콜린알포세레이트): 2026년 효능 재평가 임상에서 1차 목표 미충족, 식약처 판단 대기 중. 복용 여부는 처방의와 상의 (임의 중단·변경 금지) [S65,S66]",
+      "글리아타민과 와파린의 상호작용 자료는 찾지 못함 (없다고 확인된 것은 아님) → 처방의·약사 확인 권장"
+    ],
+    refs: ["S60", "S61", "S62", "S63", "S64", "S65", "S66"]
+  },
+  {
     id: "gout",
     name: "통풍",
     keys: ["통풍", "요산", "엄지발가락", "발가락"],
@@ -202,7 +225,8 @@ const SYMPTOMS = {
     { id: "hematuria", label: "소변에 피", refs: ["S7", "S6"] },
     { id: "nonstop", label: "멈추지 않는 출혈", refs: ["S7", "S6"] },
     { id: "chest", label: "가슴 통증·심한 호흡곤란", refs: ["S14"] },
-    { id: "hf_acute", label: "가만히 있어도 숨이 몹시 참·분홍 거품 가래", refs: ["S24"] }
+    { id: "hf_acute", label: "가만히 있어도 숨이 몹시 참·분홍 거품 가래", refs: ["S24"] },
+    { id: "seizure", label: "경련(발작)·의식을 잃음", refs: ["S61", "S64"] }
   ],
   caution: [
     { id: "gum", label: "잇몸 출혈", refs: ["S7", "S6"] },
@@ -214,7 +238,8 @@ const SYMPTOMS = {
     { id: "dig_eye", label: "물체가 노랗게·흐리게 보임", refs: ["S26", "S27"], group: "digoxin" },
     { id: "dig_sleep", label: "하루 종일 심하게 졸림·멍함", refs: ["S27", "S26"], group: "digoxin" },
     { id: "palp", label: "가슴 두근거림·맥이 불규칙한 느낌", refs: ["S26", "S14"], group: "digoxin" },
-    { id: "tremor", label: "손떨림·몸이 굳음·걸음 불안정", refs: ["S32", "S33"] }
+    { id: "tremor", label: "손떨림·몸이 굳음·걸음 불안정", refs: ["S32", "S33"] },
+    { id: "mood", label: "기분 변화·짜증·우울감", refs: ["S60"] }
   ]
 };
 
@@ -223,12 +248,12 @@ const SPO2 = { normal: 95, contact: 92, emergency: 88, refs: ["S21", "S22"] };
 
 /* 기본 복약 계획 (사용자 설명 기준, 설정에서 수정 가능) */
 const DEFAULT_MED_PLAN = [
-  { id: "p_am", label: "아침 약봉지 (심장약)", slot: "아침", every: 1 },
+  { id: "p_am", label: "아침 약봉지 (심장약·케프라·글리아타민)", slot: "아침", every: 1 },
   { id: "p_noon", label: "점심 통풍약", slot: "점심", every: 3 },
-  { id: "p_pm", label: "저녁 약봉지 (와르파린·뇌출혈 관련약)", slot: "저녁", every: 1 }
+  { id: "p_pm", label: "저녁 약봉지 (와르파린·케프라·글리아타민)", slot: "저녁", every: 1 }
 ];
 const DEFAULT_PRN = [{ id: "prn_tenormin", label: "테놀민 (두근거릴 때)" }];
-const DEFAULT_MEDS_TEXT = "와르파린나트륨정 2mg 0.75정 매일 저녁 / 리바로정 4mg 1정 / 알닥톤필름코팅정 25mg 1정 / 디고신정 0.25mg 0.5정 / 라식스정 1정 / 바스티난MR 35mg 1일 2정 / 현대테놀민정 25mg 0.5정(두근거릴 때만)";
+const DEFAULT_MEDS_TEXT = "와르파린나트륨정 2mg 0.75정 매일 저녁 / 리바로정 4mg 1정 / 알닥톤필름코팅정 25mg 1정 / 디고신정 0.25mg 0.5정 / 라식스정 1정 / 바스티난MR 35mg 1일 2정 / 현대테놀민정 25mg 0.5정(두근거릴 때만) / 케프라정 500mg 1정 아침·저녁 / 글리아타민연질캡슐 400mg 1캡슐 아침·저녁";
 
 /* 스트레칭 안내 (단계별) */
 const STRETCH = {

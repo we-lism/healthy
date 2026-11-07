@@ -20,7 +20,7 @@ function ensurePlan() {
   if (!u.medPlan) u.medPlan = DEFAULT_MED_PLAN.map(p => ({ ...p, start: (u.createdAt || new Date().toISOString()).slice(0, 10) }));
   if (!u.prn) u.prn = DEFAULT_PRN.map(p => ({ ...p }));
 }
-ensurePlan();
+ensurePlan(); if (state.user) persist();
 
 /* ---------------- 유틸 ---------------- */
 const $ = (s, el = document) => el.querySelector(s);
@@ -138,7 +138,11 @@ function evaluateDay(date) {
   const txt = dayText(log);
 
   // 1) 응급 증상
-  SYMPTOMS.emergency.forEach(s => { if (sym[s.id]) add("상", `${s.label} → 즉시 119 또는 응급실`, s.refs); });
+  SYMPTOMS.emergency.forEach(s => {
+    if (!sym[s.id]) return;
+    if (s.id === "seizure") add("상", "경련(발작) → 옆으로 눕히고 입에 아무것도 넣지 말기. 5분 이상·반복·의식이 안 돌아오면 즉시 119. 멈췄어도 오늘 진료", s.refs);
+    else add("상", `${s.label} → 즉시 119 또는 응급실`, s.refs);
+  });
   // 2) 산소포화도
   const sp = Number(log.spo2);
   if (sp) {
@@ -155,6 +159,7 @@ function evaluateDay(date) {
   const missed = duePlans(date).filter(p => !meds[p.id] && (!isToday || hr >= (SLOT_DUE_HOUR[p.slot] || 21))).map(p => p.label);
   (state.user?.prn || []).forEach(p => { if (meds[p.id]) add("하", `${p.label} 복용함 → 다음 진료 때 알리기`, []); });
   if (missed.length) add("중", `약 복용 미체크: ${missed.join(", ")} → 임의로 2배 복용하지 말고 주치의·약사 지시 따르기`, ["S2", "S7"]);
+  if (missed.length && has("neuro_meds") && missed.some(m => /케프라|아침|저녁/.test(m))) add("중", "케프라(경련 예방약)가 든 약봉지를 거르면 경련 위험 → 놓친 경우 어떻게 할지 약사에게 확인", ["S62", "S61"]);
   // 5) 약물·보충제 상호작용
   const ns = hits(txt, "nsaid");
   if (ns.length && has("warfarin")) add("중", `소염진통제(${ns.join(", ")}) 기록 → 와파린과 함께면 출혈 위험. 처방받지 않았다면 주치의 연락`, FOOD.nsaid.refs);
@@ -187,6 +192,7 @@ function evaluateDay(date) {
   if (has("warfarin") && mgToday >= 2000 && tylMg(state.logs[addDays(date, -1)]) >= 2000) add("중", "타이레놀 하루 2g 이상 2일 연속 → INR이 오를 수 있어 주치의에게 알리기", ["S48", "S49"]);
   else if (mgToday >= 2000 && has("warfarin")) add("하", `타이레놀 ${mgToday.toLocaleString()}mg → 내일도 이만큼 필요하면 주치의에게 알리기`, ["S48", "S49"]);
   const shp = log.shPain === "" || log.shPain == null ? null : Number(log.shPain);
+  if (sym.mood && has("neuro_meds")) add("중", "기분 변화·짜증·우울감 → 케프라 부작용일 수 있어 주치의에게 알리기 (임의 중단 금지)", ["S60", "S62"]);
   if (shp != null && shp >= 7) add("중", `어깨 통증 ${shp}점 → 스트레칭은 쉬고, 잠을 설치거나 계속되면 진료`, ["S55", "S56"]);
   // 6) 통풍
   if (has("gout")) {

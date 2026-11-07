@@ -138,6 +138,14 @@ function buildAdvice(date) {
     if (sym.head_injury) P("brain", "와파린 복용 중 머리 부딪힘 → 증상이 없어도 오늘 병원(CT)", ["S12"]);
     P("brain", salty ? `오늘 짠 끼니 ${salty}번 → 혈압 관리가 뇌출혈 재발 예방의 핵심. 내일은 싱겁게` : "싱겁게 먹은 하루. 혈압 관리가 뇌출혈 재발 예방의 핵심이니 유지", ["S10", "S11"]);
     if (sleep != null && (sleep < 6 || sleep > 9)) P("brain", "수면이 너무 짧거나 길면 뇌졸중 위험이 올라감 → 7~8시간 맞추기", ["S42", "S41"]);
+    if (has("neuro_meds")) {
+      if (sym.seizure) P("brain", "경련이 있었음 → 멈췄어도 오늘 신경외과 진료. 다음엔 시간을 재고 5분 넘으면 119", ["S61", "S64"]);
+      if (sleep != null && sleep < 6) P("brain", `수면 ${sleep}시간 → 잠 부족은 경련 유발 요인. 오늘 밤 일찍 자기`, ["S61", "S62"]);
+      if (fallRisk) P("brain", "어지러움·휘청거림 → 케프라 영향일 수 있음. 일어설 때 천천히, 계속되면 주치의에게 알리기", ["S60", "S47"]);
+      if (sym.mood) P("brain", "기분 변화·짜증·우울감 → 케프라 부작용일 수 있어 주치의에게 알리기. 약은 임의로 끊지 않기", ["S60", "S62"]);
+      const neuroMissed = duePlans(date).filter(p => !meds[p.id] && /케프라|아침|저녁/.test(p.label));
+      if (date !== today() && neuroMissed.length) P("brain", "케프라가 든 약봉지를 놓친 날이 있음 → 거르지 않게 알림 확인", ["S62"]);
+    }
     const lastV = state.vitals.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
     if (!lastV) P("brain", "병원 측정 혈압을 '병원측정'에 입력해 두면 다음 진료 때 추이를 보여드릴 수 있음");
     else { const d = daysBetween(lastV.date, date); if (d >= 90) P("brain", `병원 혈압 측정 후 ${d}일. 3개월 측정 시기`, ["S10"]); }
