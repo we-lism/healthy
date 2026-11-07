@@ -327,8 +327,9 @@ function renderHome() {
     <h3>최근 7일 위험도</h3><div class="strip">${strip}</div>
   </div>
   <div class="card">
-    <h2>내일 이렇게 하세요</h2>
-    ${ev.tomorrow.length ? `<ol>${ev.tomorrow.map(x => `<li>${esc(x.t)}${refTags(x.refs)}</li>`).join("")}</ol>` : `<p class="muted">일자별 기록을 입력하면 권고가 나옵니다.</p>`}
+    <h2>오늘의 맞춤 조언</h2>
+    <p class="muted">${evDate ? (evDate === t ? "오늘 입력값 기준" : evDate + " 입력값 기준") : "입력값이 쌓일수록 조언이 구체적으로 바뀝니다"}</p>
+    ${adviceHtml(evDate || t)}
   </div>
   <div class="card">
     <h2>병력 기반 관리 포인트</h2>
@@ -401,6 +402,10 @@ function renderDaily() {
       <div><label>통증 점수 (0~10)</label><input id="pain" type="number" inputmode="numeric" min="0" max="10" value="${esc(draft.pain)}"></div>
       <div><label>물 (컵)</label><input id="water" type="number" inputmode="numeric" min="0" value="${esc(draft.water)}"></div>
     </div>
+    <div class="row">
+      <div><label>스트레스 (0~10)</label><input id="stress" type="number" inputmode="numeric" min="0" max="10" value="${esc(draft.stress ?? "")}"></div>
+      <div><label>어젯밤 수면 (시간)</label><input id="sleep" type="number" inputmode="decimal" min="0" max="16" step="0.5" value="${esc(draft.sleep ?? "")}"></div>
+    </div>
   </div>
   <div class="card">
     <h2>출혈·위험 증상</h2>
@@ -440,7 +445,7 @@ function renderDaily() {
   $("#saveDay").onclick = () => {
     $$("[data-med]").forEach(c => draft.meds[c.dataset.med] = c.checked);
     $$("[data-sym]").forEach(c => { if (c.checked) draft.symptoms[c.dataset.sym] = true; else delete draft.symptoms[c.dataset.sym]; });
-    ["spo2", "weight", "pain", "water"].forEach(k => draft[k] = $("#" + k).value);
+    ["spo2", "weight", "pain", "water", "stress", "sleep"].forEach(k => draft[k] = $("#" + k).value);
     draft.note = $("#dnote").value.trim();
     if ($("#mFood").value.trim()) $("#addMeal").click();
     draft.savedAt = new Date().toISOString();
@@ -454,7 +459,8 @@ function showDayResult(date) {
   ${ev.reasons.length ? `<ul class="clean">${ev.reasons.map(r => `<li><span class="badge lv-${r.lv}" style="font-size:12px;padding:1px 8px">${r.lv}</span> ${esc(r.t)}${refTags(r.refs)}</li>`).join("")}</ul>` : "<p>특이사항 없음</p>"}
   ${ev.level === "상" ? `<a class="btn danger" style="display:block;text-align:center;text-decoration:none" href="tel:119">119 전화하기</a>` : ""}
   <h3>다음 날 권고</h3><ol>${ev.tomorrow.map(x => `<li>${esc(x.t)}${refTags(x.refs)}</li>`).join("")}</ol>
-  <button class="btn" onclick="closeModal()">확인</button>`);
+  <button class="btn" onclick="closeModal();tab='home';render()">맞춤 조언 보기</button>
+  <button class="btn btn2" onclick="closeModal()">닫기</button>`);
 }
 
 /* ---------------- 기록조회 ---------------- */

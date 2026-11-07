@@ -5,7 +5,7 @@
  * 조사일: 2026-11-07
  * ※ 본 자료는 진료를 대체하지 않습니다. 약 조절은 반드시 주치의와 상의.
  * ========================================================= */
-const KB_VERSION = "2026-11-07b";
+const KB_VERSION = "2026-11-07c";
 
 const SOURCES = {
   S1: { t: "와파린 복용자 건강한 식사 지침 (HealthLinkBC, 2023)", u: "https://www.healthlinkbc.ca/sites/default/files/documents/healthy-eating-guidelines-for-people-taking-warfarin-anticoagulants-k.pdf", type: "공공보건기관" },
@@ -43,7 +43,18 @@ const SOURCES = {
   S33: { t: "트리메타지딘 사용과 파킨슨증 위험 - 건강보험 청구자료 코호트 (서울대, 2021)", u: "https://s-space.snu.ac.kr/handle/10371/175794", type: "논문" },
   S34: { t: "푸로세미드정 허가정보 - 혈중 요산 증가·통풍 발작 (식약처, 약학정보원)", u: "https://health.kr/drug/A11A0950A0068", type: "허가정보" },
   S35: { t: "통풍 (질병관리청 국가건강정보포털)", u: "https://health.kdca.go.kr/healthinfo/biz/health/gnrlzHealthInfo/gnrlzHealthInfo/gnrlzHealthInfoView.do?cntnts_sn=6732", type: "정부기관" },
-  S36: { t: "통풍 (MSD 매뉴얼, 2025-07 검토)", u: "https://www.msdmanuals.com/ko/home/뼈-관절-근육-장애/통풍과-칼슘-피로인산염-관절염/통풍", type: "의학 매뉴얼" }
+  S36: { t: "통풍 (MSD 매뉴얼, 2025-07 검토)", u: "https://www.msdmanuals.com/ko/home/뼈-관절-근육-장애/통풍과-칼슘-피로인산염-관절염/통풍", type: "의학 매뉴얼" },
+  S37: { t: "고혈압 생활습관 개선 (경희대병원 심장내과 우종신 교수, 스포츠경향 2026-05)", u: "https://sports.khan.co.kr/article/202605171637003", type: "의사·언론" },
+  S38: { t: "자연스럽게 혈압 낮추는 방법 (코메디닷컴 2026-07)", u: "https://kormedi.com/2836614/", type: "언론" },
+  S39: { t: "혈압을 낮추는 심호흡 운동 (심장 전문의 인용·2023 메타분석, GQ 2026-06)", u: "https://www.gqkorea.co.kr/?p=386449", type: "의사·언론" },
+  S40: { t: "스트레스 호르몬과 심혈관질환 위험 (Circulation 연구, 코메디닷컴)", u: "https://kormedi.com/1356373/", type: "논문·언론" },
+  S41: { t: "수면 시간·낮잠과 심혈관 질환 위험 (JAHA, 미국심장협회 수면 7~9시간 지침, 세계일보)", u: "https://www.segye.com/newsView/20220728511641", type: "논문·언론" },
+  S42: { t: "성인 7~8시간 숙면, 수면 부족·과다와 뇌졸중 (대한수면의학회 자료, 코메디닷컴)", u: "https://kormedi.com/2816998/", type: "학회·언론" },
+  S43: { t: "급성 통풍 발작의 생활습관 중재 - 국소 얼음 치료 (코크란 리뷰)", u: "https://cochrane.org/ko/CD010519/MUSKEL_geubseong-tongpung-baljage-daehan-saenghwal-seubgwan-jungjaeyi-hyogwa", type: "논문(체계적 고찰)" },
+  S44: { t: "통풍과 운동·자세 - 급성기 관절 안정·냉찜질·거상 (정지인 전문의)", u: "https://www.hyunmyoung.co.kr/rheumatology/gout-exercise-posture/", type: "의사 글" },
+  S45: { t: "통풍에 좋은 음식과 피해야 할 음식 - 저지방 유제품·콩·달걀 (정지인 전문의)", u: "https://www.hyunmyoung.co.kr/rheumatology/gout-foods-good-bad", type: "의사 글" },
+  S46: { t: "낙상 예방 - 근력·균형 운동, 어지럼 약 점검 (김상현 신경외과 전문의)", u: "https://www.hyunmyoung.co.kr/rehabilitation/fall-prevention-prevention/", type: "의사 글" },
+  S47: { t: "노인 낙상 예방 - 천천히 일어나기, 하체 근력·균형 운동 (국민건강보험공단)", u: "https://www.nhis.or.kr/magazin/161/html/sub2.html", type: "공공기관" }
 };
 
 /* 질환 정의: 병력/현재상태 텍스트에서 키워드로 인식 */
