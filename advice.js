@@ -19,7 +19,7 @@ function buildAdvice(date) {
   const conds = detectConditions(currentProfile()).map(c => c.id);
   const has = id => conds.includes(id);
   const ev = evaluateDay(date);
-  const A = { status: [], meal: [], menu: [], exercise: [], mind: [], heart: [], brain: [], gout: [] };
+  const A = { status: [], meal: [], menu: [], exercise: [], mind: [], heart: [], brain: [], headache: [], shoulder: [], gout: [] };
   const P = (k, t, refs = []) => A[k].push({ t, refs });
   if (!log) {
     P("status", "오늘 기록이 없습니다. 하단 '일자별 관리'에서 식사·약·체중부터 입력하면 맞춤 조언이 나옵니다.");
@@ -142,6 +142,39 @@ function buildAdvice(date) {
     if (!lastV) P("brain", "병원 측정 혈압을 '병원측정'에 입력해 두면 다음 진료 때 추이를 보여드릴 수 있음");
     else { const d = daysBetween(lastV.date, date); if (d >= 90) P("brain", `병원 혈압 측정 후 ${d}일. 3개월 측정 시기`, ["S10"]); }
   }
+  /* 7-2. 두통 */
+  const tylN = Number(log.tyl) || 0, tylMgDay = tylN * (Number(log.tylMg) || 500);
+  if (log.headache === "different") P("headache", "평소와 다른 갑작스러운 심한 두통 → 진통제 먹고 기다리지 말고 지금 119", ["S54", "S52"]);
+  else if (log.headache === "usual" || has("headache") || tylN) {
+    if (log.headache === "usual") {
+      P("headache", "조용하고 어두운 곳에서 쉬기. 어젯밤 수면·오늘 스트레스도 같이 기록", ["S52", "S53"]);
+      if (sleep != null && sleep < 6) P("headache", `수면 ${sleep}시간 → 잠 부족이 두통을 키울 수 있음. 오늘 밤 7~8시간`, ["S42", "S53"]);
+      if (stress != null && stress >= 7) P("headache", "스트레스가 높은 날 → 복식호흡 5분으로 긴장 풀기", ["S39", "S53"]);
+    }
+    if (tylN) {
+      P("headache", `타이레놀 ${tylN}정(${tylMgDay.toLocaleString()}mg) 기록. 1회 1~2정, 4~6시간 간격, 하루 최대 4,000mg`, ["S50", "S51"]);
+      if (has("warfarin")) P("headache", tylMgDay >= 2000 ? "하루 2g 이상이면 와파린 효과가 세질 수 있음. 내일도 필요하면 주치의에게 먼저 알리기" : "가끔 1~2정은 괜찮은 편. 며칠 연속 많이 먹게 되면 주치의에게 알리기", ["S48", "S49"]);
+    }
+    P("headache", "이부프로펜·나프록센 같은 소염진통제는 와파린과 출혈 위험 → 두통에 쓰지 않기", ["S4", "S5"]);
+    P("headache", "이럴 땐 바로 119: 벼락 치듯 갑자기 심함, 구토, 목 뻣뻣함, 말 어눌함, 한쪽 마비", ["S54", "S52"]);
+  }
+  /* 7-3. 어깨 */
+  const shp = log.shPain === "" || log.shPain == null ? null : Number(log.shPain);
+  if (shp != null || has("shoulder")) {
+    if (shp == null) P("shoulder", "어깨 통증 점수를 입력하면 스트레칭 단계를 맞춰 드립니다");
+    else if (shp >= 7) P("shoulder", `어깨 통증 ${shp}점 → 오늘은 스트레칭 쉬기. 잠을 설치거나 며칠 계속되면 진료`, ["S55", "S56"]);
+    else if (shp >= 4) P("shoulder", `어깨 통증 ${shp}점 → 1단계 시계추 운동만 10번씩 하루 2번`, ["S55", "S58"]);
+    else P("shoulder", `어깨 통증 ${shp}점 → 시계추 → 벽 타고 올리기 → 막대 운동까지 하루 15분`, ["S55", "S57"]);
+    if (log.shRange) {
+      const order = ["어깨 아래", "어깨 높이", "얼굴 높이", "머리 위까지"];
+      let prev = null; for (let i = 1; i <= 14 && !prev; i++) { const p = state.logs[addDays(date, -i)]; if (p && p.shRange) prev = p.shRange; }
+      const d = prev ? order.indexOf(log.shRange) - order.indexOf(prev) : 0;
+      P("shoulder", `팔 높이: ${log.shRange}${prev ? ` (이전 '${prev}' → ${d > 0 ? "좋아짐" : d < 0 ? "나빠짐" : "같음"})` : ""}`, []);
+      if (d < 0) P("shoulder", "운동 범위가 줄었음 → 스트레칭 강도를 한 단계 낮추고, 계속 줄면 진료", ["S56", "S55"]);
+    }
+    if (shp == null || shp < 7) P("shoulder", "스트레칭 전 따뜻한 수건 10분. 아프지 않은 범위까지만", ["S59", "S58"]);
+    if (sym.neuro_arm) P("shoulder", "한쪽 팔에 갑자기 힘이 빠짐 → 어깨 문제가 아니라 뇌졸중 신호일 수 있음. 119", ["S8", "S9"]);
+  }
   /* 8. 통풍 */
   if (has("gout")) {
     if (flare) P("gout", `통증 ${pain}점 → 발작 의심. 소염진통제는 와파린과 함께 먹으면 출혈 위험이 커서 임의로 먹지 말고 진료`, ["S4", "S5"]);
@@ -156,10 +189,10 @@ function buildAdvice(date) {
 
 const ADVICE_TITLES = [
   ["status", "현재 상태"], ["meal", "다음 식사"], ["menu", "내일 식단"], ["exercise", "운동"],
-  ["mind", "마음·수면"], ["heart", "심장"], ["brain", "머리(뇌)"], ["gout", "통풍"]
+  ["mind", "마음·수면"], ["heart", "심장"], ["brain", "머리(뇌)"], ["headache", "두통·진통제"], ["shoulder", "어깨"], ["gout", "통풍"]
 ];
 function adviceHtml(date) {
   const { A } = buildAdvice(date);
   return ADVICE_TITLES.filter(([k]) => A[k].length).map(([k, n]) =>
-    `<h3>${n}</h3><ul class="clean">${A[k].map(x => `<li>${esc(x.t)}${refTags(x.refs)}</li>`).join("")}</ul>`).join("");
+    `<h3>${n}</h3><ul class="clean">${A[k].map(x => `<li>${esc(x.t)}${refTags(x.refs)}</li>`).join("")}</ul>${k === "shoulder" || k === "exercise" ? `<button class="btn2 btn-sm" data-stretch="1">스트레칭 방법 보기</button>` : ""}`).join("");
 }

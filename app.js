@@ -57,6 +57,21 @@ function openModal(html) { $("#modal").innerHTML = `<div class="modal" onclick="
 function closeModal() { $("#modal").innerHTML = ""; }
 window.closeModal = closeModal;
 
+/* ---------------- 스트레칭 안내 ---------------- */
+function stretchGuideHtml() {
+  const lastSh = Object.keys(state.logs).sort().reverse().map(d => state.logs[d]).find(l => l.shPain !== "" && l.shPain != null);
+  const shp = lastSh ? Number(lastSh.shPain) : null;
+  const maxLv = shp == null ? 3 : shp >= 7 ? 0 : shp >= 4 ? 1 : 3;
+  const step = (x, on) => `<div class="item" style="${on ? "" : "opacity:.45"}"><b>${x.lv ? x.lv + "단계 · " : ""}${esc(x.name)}</b>${on ? "" : " <span class='muted'>(지금은 쉬기)</span>"}${refTags(x.refs)}<ol>${x.how.map(h => `<li>${esc(h)}</li>`).join("")}</ol></div>`;
+  return `<h2>스트레칭 방법</h2>
+  ${shp != null ? `<p>최근 어깨 통증 <b>${shp}점</b> → ${maxLv === 0 ? "오늘은 어깨 스트레칭을 쉬고 진료를 고려하세요" : maxLv === 1 ? "1단계(시계추)만 하세요" : "1~3단계 모두 가능"}</p>` : `<p class="muted">일자별 관리에 어깨 통증을 입력하면 단계를 맞춰 드립니다.</p>`}
+  <h3>지킬 것</h3><ul class="clean">${STRETCH.rules.map(r => `<li>${esc(r.t)}${refTags(r.refs)}</li>`).join("")}</ul>
+  <h3>어깨 (단계별)</h3>${STRETCH.shoulder.map(x => step(x, x.lv <= maxLv)).join("")}
+  <h3>다리 근력·균형 (넘어짐 예방)</h3>${STRETCH.body.map(x => step(x, true)).join("")}
+  <button class="btn" onclick="closeModal()">닫기</button>`;
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-stretch]")) openModal(stretchGuideHtml()); });
+
 /* ---------------- 음성 입력 ---------------- */
 const MIC_SVG = '<svg viewBox="0 0 24 24"><path fill="#1f5f5b" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z"/></svg>';
 function voiceField(id, opts = {}) {
@@ -159,6 +174,20 @@ function evaluateDay(date) {
       else if (w7 != null && w - w7 >= 2) add("중", `체중 ${(w - w7).toFixed(1)}kg 증가 (1주 사이) → 병원에서 이뇨제 조절 상담`, ["S23", "S25"]);
     }
   }
+  // 5-3) 두통·타이레놀·어깨
+  if (log.headache === "different") add("상", "평소와 다른 갑작스러운 심한 두통 → 뇌출혈 이력이 있어 즉시 119", ["S54", "S10"]);
+  else if (log.headache === "usual") {
+    let hd = 1; for (let i = 1; i <= 6; i++) { const p = state.logs[addDays(date, -i)]; if (p && p.headache) hd++; }
+    if (hd >= 3) add("중", `최근 7일 중 ${hd}일 두통 → 잦아지면 신경과·신경외과 진료 (두통 기록을 가져가기)`, ["S53", "S52"]);
+    else add("하", "평소 같은 두통 → 쉬고 기록. 양상이 바뀌면 바로 진료", ["S52", "S53"]);
+  }
+  const tylMg = d => (Number(d?.tyl) || 0) * (Number(d?.tylMg) || 500);
+  const mgToday = tylMg(log);
+  if (mgToday > 4000) add("중", `타이레놀 ${mgToday.toLocaleString()}mg → 하루 최대 4,000mg 초과. 간 손상 위험, 약사·의사 상담`, ["S50", "S51"]);
+  if (has("warfarin") && mgToday >= 2000 && tylMg(state.logs[addDays(date, -1)]) >= 2000) add("중", "타이레놀 하루 2g 이상 2일 연속 → INR이 오를 수 있어 주치의에게 알리기", ["S48", "S49"]);
+  else if (mgToday >= 2000 && has("warfarin")) add("하", `타이레놀 ${mgToday.toLocaleString()}mg → 내일도 이만큼 필요하면 주치의에게 알리기`, ["S48", "S49"]);
+  const shp = log.shPain === "" || log.shPain == null ? null : Number(log.shPain);
+  if (shp != null && shp >= 7) add("중", `어깨 통증 ${shp}점 → 스트레칭은 쉬고, 잠을 설치거나 계속되면 진료`, ["S55", "S56"]);
   // 6) 통풍
   if (has("gout")) {
     const vh = hits(txt, "purine_vhigh"), h = hits(txt, "purine_high"), al = hits(txt, "alcohol"), fr = hits(txt, "fructose");
@@ -408,6 +437,20 @@ function renderDaily() {
     </div>
   </div>
   <div class="card">
+    <h2>두통·어깨</h2>
+    <label>두통</label>
+    <select id="headache">${[["", "없음"], ["usual", "평소 같은 두통 (앞머리·옆머리)"], ["different", "평소와 다른 갑작스러운 심한 두통"]].map(([v, n]) => `<option value="${v}" ${(draft.headache || "") === v ? "selected" : ""}>${n}</option>`).join("")}</select>
+    <div class="row">
+      <div><label>타이레놀 (오늘 총 몇 정)</label><input id="tyl" type="number" inputmode="numeric" min="0" max="20" value="${esc(draft.tyl ?? "")}"></div>
+      <div><label>종류</label><select id="tylMg">${[["500", "500mg"], ["650", "이알 650mg"]].map(([v, n]) => `<option value="${v}" ${(draft.tylMg || "500") === v ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+    </div>
+    <div class="row">
+      <div><label>어깨 통증 (0~10)</label><input id="shPain" type="number" inputmode="numeric" min="0" max="10" value="${esc(draft.shPain ?? "")}"></div>
+      <div><label>팔 올라가는 높이</label><select id="shRange">${["", "머리 위까지", "얼굴 높이", "어깨 높이", "어깨 아래"].map(v => `<option ${(draft.shRange || "") === v ? "selected" : ""} value="${v}">${v || "선택"}</option>`).join("")}</select></div>
+    </div>
+    <button type="button" class="btn btn2" data-stretch="1">스트레칭 방법 보기</button>
+  </div>
+  <div class="card">
     <h2>출혈·위험 증상</h2>
     <h3 style="color:var(--hi)">하나라도 있으면 119</h3>
     <div class="checks">${SYMPTOMS.emergency.map(s => `<label><input type="checkbox" data-sym="${s.id}" ${draft.symptoms[s.id] ? "checked" : ""}>${esc(s.label)}</label>`).join("")}</div>
@@ -445,7 +488,7 @@ function renderDaily() {
   $("#saveDay").onclick = () => {
     $$("[data-med]").forEach(c => draft.meds[c.dataset.med] = c.checked);
     $$("[data-sym]").forEach(c => { if (c.checked) draft.symptoms[c.dataset.sym] = true; else delete draft.symptoms[c.dataset.sym]; });
-    ["spo2", "weight", "pain", "water", "stress", "sleep"].forEach(k => draft[k] = $("#" + k).value);
+    ["spo2", "weight", "pain", "water", "stress", "sleep", "headache", "tyl", "tylMg", "shPain", "shRange"].forEach(k => draft[k] = $("#" + k).value);
     draft.note = $("#dnote").value.trim();
     if ($("#mFood").value.trim()) $("#addMeal").click();
     draft.savedAt = new Date().toISOString();
@@ -479,7 +522,7 @@ function renderHistory() {
     $("#hlist").innerHTML = list.length ? list.map(d => {
       const l = state.logs[d], ev = evaluateDay(d);
       return `<div class="item" data-open="${d}"><b>${d}</b> ${riskBadge(ev.level)}<br>
-      <span class="muted">식사 ${l.meals.length} · 운동 ${(l.exercises || []).reduce((n, x) => n + (+x.min || 0), 0)}분 · 약 ${duePlans(d).filter(p => l.meds?.[p.id]).length}/${duePlans(d).length}${l.spo2 ? " · SpO2 " + esc(l.spo2) + "%" : ""}${l.weight ? " · " + esc(l.weight) + "kg" : ""}</span>
+      <span class="muted">식사 ${l.meals.length} · 운동 ${(l.exercises || []).reduce((n, x) => n + (+x.min || 0), 0)}분 · 약 ${duePlans(d).filter(p => l.meds?.[p.id]).length}/${duePlans(d).length}${l.spo2 ? " · SpO2 " + esc(l.spo2) + "%" : ""}${l.weight ? " · " + esc(l.weight) + "kg" : ""}${l.headache ? " · 두통" : ""}${Number(l.tyl) ? " · 타이레놀 " + esc(l.tyl) + "정" : ""}${l.shPain !== "" && l.shPain != null ? " · 어깨 " + esc(l.shPain) + "점" : ""}</span>
       ${l.meals.length ? `<br>${l.meals.map(m => esc(m.type + ": " + m.food)).join("<br>")}` : ""}</div>`;
     }).join("") : `<p class="muted">기록이 없습니다.</p>`;
   };

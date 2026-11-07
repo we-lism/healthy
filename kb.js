@@ -5,7 +5,7 @@
  * 조사일: 2026-11-07
  * ※ 본 자료는 진료를 대체하지 않습니다. 약 조절은 반드시 주치의와 상의.
  * ========================================================= */
-const KB_VERSION = "2026-11-07c";
+const KB_VERSION = "2026-11-07d";
 
 const SOURCES = {
   S1: { t: "와파린 복용자 건강한 식사 지침 (HealthLinkBC, 2023)", u: "https://www.healthlinkbc.ca/sites/default/files/documents/healthy-eating-guidelines-for-people-taking-warfarin-anticoagulants-k.pdf", type: "공공보건기관" },
@@ -54,7 +54,19 @@ const SOURCES = {
   S44: { t: "통풍과 운동·자세 - 급성기 관절 안정·냉찜질·거상 (정지인 전문의)", u: "https://www.hyunmyoung.co.kr/rheumatology/gout-exercise-posture/", type: "의사 글" },
   S45: { t: "통풍에 좋은 음식과 피해야 할 음식 - 저지방 유제품·콩·달걀 (정지인 전문의)", u: "https://www.hyunmyoung.co.kr/rheumatology/gout-foods-good-bad", type: "의사 글" },
   S46: { t: "낙상 예방 - 근력·균형 운동, 어지럼 약 점검 (김상현 신경외과 전문의)", u: "https://www.hyunmyoung.co.kr/rehabilitation/fall-prevention-prevention/", type: "의사 글" },
-  S47: { t: "노인 낙상 예방 - 천천히 일어나기, 하체 근력·균형 운동 (국민건강보험공단)", u: "https://www.nhis.or.kr/magazin/161/html/sub2.html", type: "공공기관" }
+  S47: { t: "노인 낙상 예방 - 천천히 일어나기, 하체 근력·균형 운동 (국민건강보험공단)", u: "https://www.nhis.or.kr/magazin/161/html/sub2.html", type: "공공기관" },
+  S48: { t: "Effect of acetaminophen on INR in patients receiving warfarin (Pharmacotherapy 2011, 문헌고찰)", u: "https://pubmed.ncbi.nlm.nih.gov/21923443/", type: "논문" },
+  S49: { t: "Acetaminophen 2 g/day and 3 g/day potentiate warfarin - 무작위 대조시험 (2011)", u: "https://www.pubmed.gov/21191575/", type: "논문" },
+  S50: { t: "타이레놀정500mg 허가정보 - 1일 최대 4,000mg (식약처, 약학정보원)", u: "https://www.health.kr/drug/2021082400002", type: "허가정보" },
+  S51: { t: "타이레놀 500mg 용법 - 1회 1~2정, 4~6시간 간격, 1일 최대 8정 (더파마시 약국)", u: "https://www.thepharmacy.co.kr/%ed%83%80%ec%9d%b4%eb%a0%88%eb%86%80-500mg", type: "약국" },
+  S52: { t: "편두통과 함께 나타나는 증상 - 위험 신호, 두통 일기 (김상현 신경외과 전문의)", u: "https://www.hyunmyoung.co.kr/headache/migraine-associated-symptoms", type: "의사 글" },
+  S53: { t: "긴장형 두통, 병원 가야 할 타이밍 - 위험 신호, 진통제 과용 (정지인 내과 전문의)", u: "https://www.hyunmyoung.co.kr/general-medicine/tension-headache-when-to-see-doctor", type: "의사 글" },
+  S54: { t: "지주막하출혈, 병원 가야 할 타이밍 - 벼락두통 (김상현 신경외과 전문의, 2026-06)", u: "https://www.hyunmyoung.co.kr/neurosurgery/subarachnoid-hemorrhage-when-to-see-doctor", type: "의사 글" },
+  S55: { t: "오십견 환자가 일상에서 지켜야 할 것 - 통증 범위 내 시계추·벽 타기·막대 운동 (김상현 전문의, 2026-06)", u: "https://www.hyunmyoung.co.kr/shoulder/frozen-shoulder-daily-care", type: "의사 글" },
+  S56: { t: "어깨 스트레칭, 이렇게 하면 오히려 악화됩니다 (김상현 전문의)", u: "https://www.hyunmyoung.co.kr/spine/어깨-스트레칭-이렇게-하면-오히려-악화됩니다", type: "의사 글" },
+  S57: { t: "정적 스트레칭이 중년 여성 어깨굳음증의 통증·운동범위에 미치는 영향 (대한물리치료과학회지 2024)", u: "https://koreascience.kr/article/JAKO202422639195308.pdf", type: "논문" },
+  S58: { t: "어깨 통증 재활운동 - 아프지 않을 만큼, 코드만·지팡이 운동 (대구파티마병원 재활의학과, 매일신문)", u: "https://www.imaeil.com/page/view/2020071314043388148", type: "의사·언론" },
+  S59: { t: "오십견 자가 점검과 스트레칭 - 온찜질 후 스트레칭 (정형외과 전문의 조언, 인사이트 2026-10)", u: "https://www.insight.co.kr/news/575955", type: "언론" }
 };
 
 /* 질환 정의: 병력/현재상태 텍스트에서 키워드로 인식 */
@@ -124,6 +136,32 @@ const CONDITIONS = [
     refs: ["S30", "S31", "S32", "S33", "S12"]
   },
   {
+    id: "headache",
+    name: "두통 (가끔 앞머리·옆머리, 타이레놀 복용)",
+    keys: ["두통", "편두통", "타이레놀", "아세트아미노펜"],
+    summary: [
+      "평소와 다른 갑작스러운 극심한 두통, 구토·목 뻣뻣함·마비·말 어눌함이 같이 오면 즉시 119 [S54,S52,S53]",
+      "뇌출혈 이력·와파린 복용 중이라 '평소와 다른 두통'은 특히 가볍게 넘기지 않기 [S10,S12]",
+      "타이레놀은 와파린과 함께 쓸 수 있는 진통제. 다만 하루 2g(500mg 4정) 이상을 며칠 이어 먹으면 INR이 오를 수 있어 주치의에게 알리기 [S48,S49]",
+      "타이레놀 500mg: 1회 1~2정, 4~6시간 간격, 하루 최대 8정(4,000mg) [S50,S51]",
+      "두통 날짜·시간·먹은 약을 기록(두통 일기)하면 원인 찾기와 진료에 도움 [S52,S53]"
+    ],
+    refs: ["S48", "S49", "S50", "S51", "S52", "S53", "S54"]
+  },
+  {
+    id: "shoulder",
+    name: "어깨 관절 (팔 올리기 회복 중)",
+    keys: ["어깨", "오십견", "팔을 올리"],
+    summary: [
+      "통증이 무서워 안 움직이면 더 굳음. 아프지 않은 범위에서 매일 조금씩 [S55,S58]",
+      "무리하게 꺾고 늘리는 스트레칭은 오히려 악화 [S56,S58]",
+      "시계추 운동 → 벽 타고 올리기 → 막대 운동 순서로 단계 올리기 [S55,S56,S58]",
+      "따뜻한 찜질로 풀어준 뒤 스트레칭하면 덜 뻣뻣함 [S59,S55]",
+      "통증으로 잠을 설치거나 몇 주째 안 좋아지면 진료. 갑자기 한쪽 팔에 힘이 빠지면 어깨가 아니라 뇌 신호일 수 있어 119 [S55,S8]"
+    ],
+    refs: ["S55", "S56", "S57", "S58", "S59"]
+  },
+  {
     id: "gout",
     name: "통풍",
     keys: ["통풍", "요산", "엄지발가락", "발가락"],
@@ -191,3 +229,23 @@ const DEFAULT_MED_PLAN = [
 ];
 const DEFAULT_PRN = [{ id: "prn_tenormin", label: "테놀민 (두근거릴 때)" }];
 const DEFAULT_MEDS_TEXT = "와르파린나트륨정 2mg 0.75정 매일 저녁 / 리바로정 4mg 1정 / 알닥톤필름코팅정 25mg 1정 / 디고신정 0.25mg 0.5정 / 라식스정 1정 / 바스티난MR 35mg 1일 2정 / 현대테놀민정 25mg 0.5정(두근거릴 때만)";
+
+/* 스트레칭 안내 (단계별) */
+const STRETCH = {
+  shoulder: [
+    { lv: 1, name: "시계추 운동", how: ["식탁을 성한 손으로 짚고 허리를 살짝 숙임", "아픈 팔은 힘을 빼고 아래로 늘어뜨림", "몸을 살살 흔들어 팔이 작은 원을 그리게 함", "시계 방향 10번, 반대 방향 10번"], refs: ["S55", "S56", "S58"] },
+    { lv: 2, name: "벽 타고 올리기", how: ["벽을 마주 보고 한 걸음 떨어져 섬", "아픈 쪽 손가락으로 벽을 한 칸씩 걸어 올라감", "당기는 느낌이 드는 곳에서 10초 멈춤 (아프면 거기서 멈춤)", "천천히 내려와 5번 반복. 매일 올라간 높이를 기억"], refs: ["S55", "S56"] },
+    { lv: 3, name: "막대(우산) 운동", how: ["바닥이나 침대에 누움", "양손으로 막대나 우산을 어깨너비로 잡음", "성한 팔이 도와주며 막대를 머리 위로 천천히 올림", "아프기 직전에서 10초 멈추고 내림. 5~10번"], refs: ["S55", "S58"] }
+  ],
+  body: [
+    { name: "의자 잡고 앉았다 일어서기", how: ["튼튼한 의자 앞에 섬, 식탁이나 벽을 잡음", "천천히 앉았다가 천천히 일어섬", "10번 × 2세트"], refs: ["S46", "S47"] },
+    { name: "까치발 들기", how: ["식탁을 양손으로 잡고 섬", "발뒤꿈치를 천천히 들었다 내림", "10번 × 2세트 (통풍 발작 중에는 쉬기)"], refs: ["S47", "S44"] },
+    { name: "옆으로 누워 다리 들기", how: ["옆으로 누워 아래 팔로 머리를 받침", "위쪽 다리를 곧게 펴서 천천히 들었다 내림", "양쪽 10번씩"], refs: ["S47"] }
+  ],
+  rules: [
+    { t: "아프지 않은 범위에서만. 통증을 참고 늘리지 않기", refs: ["S56", "S58"] },
+    { t: "따뜻한 수건으로 10분 데운 뒤 하면 덜 뻣뻣함 (너무 뜨겁지 않게)", refs: ["S59", "S55"] },
+    { t: "어지러우면 앉거나 누워서 하는 동작만", refs: ["S47", "S46"] },
+    { t: "하루 15분 정도, 매일 꾸준히 (중년 여성 어깨굳음증 연구에서 통증·운동범위 개선)", refs: ["S57", "S55"] }
+  ]
+};
