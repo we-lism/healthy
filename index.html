@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>건강참조</title>
+<meta name="theme-color" content="#1f5f5b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#f4f1ea; --card:#fffdf8; --ink:#1f2a28; --sub:#5c6a67; --line:#e2ddd2;
+  --brand:#1f5f5b; --brand2:#2f7f79; --hi:#c0392b; --mid:#c77c0e; --lo:#2e7d4f;
+  --hi-bg:#fbe9e6; --mid-bg:#fdf1dc; --lo-bg:#e6f3ea;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:17px;line-height:1.5}
+body{padding-bottom:84px}
+header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-.3px}
+header .who{font-size:14px;opacity:.85}
+main{padding:14px;max-width:640px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:18px;margin:0 0 10px}
+.card h3{font-size:16px;margin:14px 0 8px;color:var(--brand)}
+label{display:block;font-size:15px;color:var(--sub);margin:10px 0 4px}
+input,select,textarea{width:100%;font-size:17px;padding:11px 12px;border:1px solid #cfc8b9;border-radius:10px;background:#fff;color:var(--ink);font-family:inherit}
+textarea{min-height:80px;resize:vertical}
+.row{display:flex;gap:8px;align-items:flex-end}
+.row>*{flex:1}
+.row .narrow{flex:0 0 auto}
+button{font-family:inherit;font-size:17px;border:0;border-radius:10px;padding:12px 16px;cursor:pointer}
+.btn{background:var(--brand);color:#fff;width:100%;font-weight:700;margin-top:14px}
+.btn2{background:#e9e4d8;color:var(--ink)}
+.btn-sm{padding:8px 12px;font-size:15px}
+.danger{background:var(--hi);color:#fff}
+.link{background:none;color:var(--brand);text-decoration:underline;padding:6px 0}
+.voice-wrap{position:relative}
+.voice-wrap input,.voice-wrap textarea{padding-right:52px}
+.mic{position:absolute;right:6px;top:6px;width:40px;height:40px;padding:0;border-radius:50%;background:#e9e4d8;display:flex;align-items:center;justify-content:center}
+.mic.on{background:var(--hi)}
+.mic svg{width:20px;height:20px}
+.mic.on svg path{fill:#fff}
+.badge{display:inline-block;font-weight:800;border-radius:999px;padding:4px 14px;font-size:16px}
+.lv-상{background:var(--hi-bg);color:var(--hi)}
+.lv-중{background:var(--mid-bg);color:var(--mid)}
+.lv-하{background:var(--lo-bg);color:var(--lo)}
+.lv-없음{background:#eee;color:#777}
+.risk-big{text-align:center;padding:10px 0}
+.risk-big .badge{font-size:28px;padding:10px 28px}
+ul.clean{margin:6px 0;padding-left:20px}
+ul.clean li{margin:4px 0}
+.ref{font-size:12px;color:var(--brand2);vertical-align:super;margin-left:2px;cursor:pointer}
+.muted{color:var(--sub);font-size:14px}
+.alert{border-radius:12px;padding:14px;margin-bottom:14px;font-weight:600}
+.alert.hi{background:var(--hi);color:#fff}
+.alert.mid{background:var(--mid-bg);color:#7a4a00}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#fff}
+.item .x{float:right;background:none;color:var(--hi);font-size:15px;padding:2px 6px}
+.checks label{display:flex;align-items:center;gap:10px;color:var(--ink);font-size:16px;margin:8px 0}
+.checks input{width:24px;height:24px;flex:0 0 24px}
+.meds{display:flex;gap:8px}
+.meds label{flex:1;border:1px solid var(--line);border-radius:10px;padding:12px 8px;justify-content:center;background:#fff;margin:0}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.strip div{flex:0 0 auto;text-align:center;font-size:13px;color:var(--sub)}
+.strip .badge{font-size:14px;padding:3px 10px;display:block;margin-top:2px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:6}
+nav button{flex:1;background:none;color:var(--sub);font-size:14px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button.on{color:var(--brand);font-weight:700}
+nav button.daily{background:var(--brand);color:#fff;border-radius:12px;margin:0 4px;font-weight:700}
+.hidden{display:none!important}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{border-bottom:1px solid var(--line);padding:8px 4px;text-align:left;vertical-align:top}
+.tag{display:inline-block;background:#e6efee;color:var(--brand);border-radius:6px;padding:2px 8px;font-size:13px;margin:2px 4px 2px 0}
+.disclaimer{font-size:13px;color:var(--sub);text-align:center;margin:8px 0 20px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1f2a28;color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;z-index:20;max-width:90%}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.modal .sheet{background:var(--card);width:100%;max-width:640px;border-radius:18px 18px 0 0;padding:18px;max-height:85vh;overflow:auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>건강참조</h1>
+  <span class="who" id="who"></span>
+</header>
+<main id="app"></main>
+<nav id="nav" class="hidden">
+  <button data-tab="home">홈</button>
+  <button data-tab="history">기록조회</button>
+  <button data-tab="daily" class="daily">일자별 관리</button>
+  <button data-tab="vitals">병원측정</button>
+  <button data-tab="settings">설정</button>
+</nav>
+<div id="modal"></div>
+<script src="kb.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
